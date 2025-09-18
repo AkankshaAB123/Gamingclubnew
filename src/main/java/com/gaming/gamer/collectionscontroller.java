@@ -1,7 +1,6 @@
 package com.gaming.gamer;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -11,40 +10,31 @@ import org.springframework.web.bind.annotation.*;
 public class collectionscontroller {
 
     @Autowired
-    private collectionsrepository repo;
+    private collectionsservice service;
 
     @PostMapping
     public collections create(@RequestBody collections collection) {
-        collection.setId(null);
-        return repo.save(collection);
+        return service.create(collection);
     }
 
     @GetMapping
-    public List<collections> findAll() {
-        return repo.findAll();
+    public List<collections> getAll() {
+        return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public collections findById(@PathVariable String id) {
-        return repo.findById(id).orElse(null);
+    public collections getById(@PathVariable String id) {
+        return service.findById(id);
     }
 
     @PutMapping("/{id}")
-    public collections update(@PathVariable String id, @RequestBody collections updated) {
-        collections old = repo.findById(id).orElse(null);
-        if (old != null) {
-            old.setDate(updated.getDate());
-            old.setAmount(updated.getAmount());
-            return repo.save(old);
-        }
-        return null;
+    public collections update(@PathVariable String id, @RequestBody collections collection) {
+        return service.update(id, collection);
     }
 
     @DeleteMapping("/{id}")
-    public boolean delete(@PathVariable String id) {
-        Optional<collections> optional = repo.findById(id);
-        if (optional.isEmpty()) return false;
-        repo.deleteById(id);
-        return true;
+    public String delete(@PathVariable String id) {
+        service.delete(id);
+        return "Collection deleted successfully";
     }
 }

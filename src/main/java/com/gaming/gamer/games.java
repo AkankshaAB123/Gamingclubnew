@@ -12,8 +12,17 @@ public class games {
     private String name;
     private Double price;
     private String description;
+    
+    
+    public games(String id, String name, Double price, String description) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.description = description;
+    }
 
-    // Getters & Setters
+
+	// Getters & Setters
     public String getId() {
         return id;
     }

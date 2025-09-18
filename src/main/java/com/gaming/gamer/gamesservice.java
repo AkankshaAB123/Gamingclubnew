@@ -35,7 +35,7 @@ public class gamesservice {
     }
 
     public games update(String id, games updated) {
-        games old = findById(id);
+        games old = findById(id);  // will throw exception if not found
         log.info("Updating game by id {}", id);
         old.setName(updated.getName());
         old.setPrice(updated.getPrice());
@@ -43,11 +43,10 @@ public class gamesservice {
         return repo.save(old);
     }
 
-    public boolean delete(String id) {
-        games old = findById(id);
+    public void delete(String id) {
+        games old = findById(id);  // will throw exception if not found
         log.info("Deleting game by id {}", id);
         repo.delete(old);
-        return true;
     }
 
     private void validate(games game) {

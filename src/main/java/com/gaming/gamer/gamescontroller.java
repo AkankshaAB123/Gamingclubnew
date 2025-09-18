@@ -1,8 +1,6 @@
 package com.gaming.gamer;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,49 +9,35 @@ import org.springframework.web.bind.annotation.*;
 public class gamescontroller {
 
     @Autowired
-    private gamesrepository repo;
+    private gamesservice service;   // ✅ Use service instead of repo
 
     // Create a new game
     @PostMapping
     public games create(@RequestBody games game) {
-        game.setId(null); // let MongoDB generate ObjectId
-        return repo.save(game);
+        return service.create(game);
     }
 
     // Get all games
     @GetMapping
     public List<games> findAll() {
-        return repo.findAll();
+        return service.findAll();
     }
 
     // Get game by ID
     @GetMapping(path="/{id}")
     public games findById(@PathVariable String id) {
-        return repo.findById(id).orElse(null);
+        return service.findById(id);   // ✅ exception-safe
     }
 
     // Update an existing game
     @PutMapping(path="/{id}")
     public games update(@PathVariable String id, @RequestBody games game) {
-        games oldGame = repo.findById(id).orElse(null);
-        if (oldGame == null) {
-            return null; // or throw exception
-        }
-        oldGame.setName(game.getName());
-        oldGame.setDescription(game.getDescription());
-        oldGame.setPrice(game.getPrice());
-
-        return repo.save(oldGame);
+        return service.update(id, game);
     }
 
     // Delete game by ID
     @DeleteMapping(path="/{id}")
-    public boolean delete(@PathVariable String id) {
-        Optional<games> optionalGame = repo.findById(id);
-        if (optionalGame.isEmpty()) {
-            return false;
-        }
-        repo.deleteById(id);
-        return true;
+    public void delete(@PathVariable String id) {
+        service.delete(id);   // ✅ will throw exception if not found
     }
 }

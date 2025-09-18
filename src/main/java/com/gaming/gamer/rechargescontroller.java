@@ -1,8 +1,6 @@
 package com.gaming.gamer;
 
 import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,41 +9,35 @@ import org.springframework.web.bind.annotation.*;
 public class rechargescontroller {
 
     @Autowired
-    private rechargesrepository repo;
+    private rechargesservice service;  // ✅ Use service, not repo
 
+    // Create a new recharge
     @PostMapping
     public recharges create(@RequestBody recharges recharge) {
-        recharge.setId(null);
-        return repo.save(recharge);
+        return service.create(recharge);
     }
 
+    // Get all recharges
     @GetMapping
     public List<recharges> findAll() {
-        return repo.findAll();
+        return service.findAll();
     }
 
+    // Get recharge by ID
     @GetMapping("/{id}")
     public recharges findById(@PathVariable String id) {
-        return repo.findById(id).orElse(null);
+        return service.findById(id);  // ✅ exception-safe
     }
 
+    // Update recharge
     @PutMapping("/{id}")
     public recharges update(@PathVariable String id, @RequestBody recharges updated) {
-        recharges old = repo.findById(id).orElse(null);
-        if (old != null) {
-            old.setMemberId(updated.getMemberId());
-            old.setAmount(updated.getAmount());
-            old.setDateTime(updated.getDateTime());
-            return repo.save(old);
-        }
-        return null;
+        return service.update(id, updated);  // ✅ exception-safe
     }
 
+    // Delete recharge
     @DeleteMapping("/{id}")
-    public boolean delete(@PathVariable String id) {
-        Optional<recharges> optional = repo.findById(id);
-        if (optional.isEmpty()) return false;
-        repo.deleteById(id);
-        return true;
+    public void delete(@PathVariable String id) {
+        service.delete(id);  // ✅ exception-safe
     }
 }

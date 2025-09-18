@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class rechargesservice {
+
     private static final Logger log = LoggerFactory.getLogger(rechargesservice.class);
 
     @Autowired
     private rechargesrepository repo;
 
+    // Create recharge
     public recharges create(recharges recharge) {
         log.info("Creating recharge for memberId {}", recharge.getMemberId());
         recharge.setId(null);
@@ -20,11 +22,13 @@ public class rechargesservice {
         return repo.save(recharge);
     }
 
+    // Get all recharges
     public List<recharges> findAll() {
         log.info("Finding all recharges");
         return repo.findAll();
     }
 
+    // Get recharge by ID
     public recharges findById(String id) {
         log.info("Finding recharge by id {}", id);
         return repo.findById(id)
@@ -34,8 +38,9 @@ public class rechargesservice {
                 });
     }
 
+    // Update recharge
     public recharges update(String id, recharges updated) {
-        recharges old = findById(id);
+        recharges old = findById(id);  // ✅ throws if not found
         log.info("Updating recharge by id {}", id);
         old.setAmount(updated.getAmount());
         old.setDateTime(updated.getDateTime());
@@ -43,13 +48,14 @@ public class rechargesservice {
         return repo.save(old);
     }
 
-    public boolean delete(String id) {
-        recharges old = findById(id);
+    // Delete recharge
+    public void delete(String id) {
+        recharges old = findById(id);  // ✅ throws if not found
         log.info("Deleting recharge by id {}", id);
         repo.delete(old);
-        return true;
     }
 
+    // Validation
     private void validate(recharges recharge) {
         if (recharge.getAmount() < 0) {
             log.error("Recharge amount cannot be negative");
