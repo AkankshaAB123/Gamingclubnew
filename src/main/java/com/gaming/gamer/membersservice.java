@@ -10,10 +10,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class membersservice {
+
     private static final Logger logger = LoggerFactory.getLogger(membersservice.class);
 
+    private final membersrepository repo;
+
     @Autowired
-    private membersrepository repo;
+    public membersservice(membersrepository repo) {
+        this.repo = repo;
+    }
 
     // CREATE MEMBER
     public MemberSearchResponseDTO create(MemberDTO memberDTO) {
@@ -35,17 +40,19 @@ public class membersservice {
     // FIND ALL MEMBERS
     public List<MemberSearchResponseDTO> findAll() {
         logger.info("Fetching all members");
-        return repo.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
+        return repo.findAll().stream()
+                   .map(this::mapToDTO)
+                   .collect(Collectors.toList());
     }
 
-    // FIND BY ID
+    // FIND MEMBER BY ID
     public MemberSearchResponseDTO findById(String id) {
         logger.info("Searching member by Id: {}", id);
         members member = repo.findById(id)
-                .orElseThrow(() -> {
-                    logger.error("❌ Member not found: {}", id);
-                    return new ResourceNotFoundException("Member not found: " + id);
-                });
+                             .orElseThrow(() -> {
+                                 logger.error("❌ Member not found: {}", id);
+                                 return new ResourceNotFoundException("Member not found: " + id);
+                             });
         return mapToDTO(member);
     }
 
@@ -53,10 +60,10 @@ public class membersservice {
     public MemberSearchResponseDTO update(String id, MemberDTO updatedDTO) {
         logger.info("Updating member with Id: {}", id);
         members old = repo.findById(id)
-                .orElseThrow(() -> {
-                    logger.error("❌ Member not found: {}", id);
-                    return new ResourceNotFoundException("Member not found: " + id);
-                });
+                          .orElseThrow(() -> {
+                              logger.error("❌ Member not found: {}", id);
+                              return new ResourceNotFoundException("Member not found: " + id);
+                          });
 
         old.setName(updatedDTO.getName());
         old.setPhone(updatedDTO.getPhone());
@@ -71,13 +78,25 @@ public class membersservice {
     public void delete(String id) {
         logger.info("Deleting member with Id: {}", id);
         members member = repo.findById(id)
-                .orElseThrow(() -> {
-                    logger.error("❌ Member not found: {}", id);
-                    return new ResourceNotFoundException("Member not found: " + id);
-                });
+                             .orElseThrow(() -> {
+                                 logger.error("❌ Member not found: {}", id);
+                                 return new ResourceNotFoundException("Member not found: " + id);
+                             });
 
         repo.delete(member);
         logger.info("✅ Member deleted: {} (Id: {})", member.getName(), member.getId());
+    }
+
+    // SEARCH MEMBER BY PHONE
+    public MemberSearchResponseDTO searchByPhone(String phone) {
+        logger.info("Searching member by phone: {}", phone);
+        members member = repo.findByPhone(phone)
+                             .orElseThrow(() -> {
+                                 logger.error("❌ Member not found with phone: {}", phone);
+                                 return new ResourceNotFoundException("Member not found with phone: " + phone);
+                             });
+        logger.info("✅ Member found: {} (Phone: {})", member.getName(), member.getPhone());
+        return mapToDTO(member);
     }
 
     // VALIDATION
@@ -90,7 +109,7 @@ public class membersservice {
 
     // HELPER: MAP ENTITY → DTO
     private MemberSearchResponseDTO mapToDTO(members member) {
-    	MemberSearchResponseDTO dto = new MemberSearchResponseDTO();
+        MemberSearchResponseDTO dto = new MemberSearchResponseDTO();
         dto.setId(member.getId());
         dto.setName(member.getName());
         dto.setPhone(member.getPhone());
