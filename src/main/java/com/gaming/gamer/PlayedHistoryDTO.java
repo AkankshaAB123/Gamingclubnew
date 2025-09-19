@@ -1,12 +1,20 @@
 package com.gaming.gamer;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 public class PlayedHistoryDTO {
-    private Long id;
-    private LocalDateTime date_time;
+    private String id;
+    private Date date_time;
     private String game_name;
-    private Double amount;
+    private double amount;
 
-    // getters & setters
+    // Getters and Setters
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+    public Date getDate_time() { return date_time; }
+    public void setDate_time(Date date_time) { this.date_time = date_time; }
+    public String getGame_name() { return game_name; }
+    public void setGame_name(String game_name) { this.game_name = game_name; }
+    public double getAmount() { return amount; }
+    public void setAmount(double amount) { this.amount = amount; }
 }

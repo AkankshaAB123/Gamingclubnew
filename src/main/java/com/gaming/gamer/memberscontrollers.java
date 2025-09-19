@@ -1,58 +1,60 @@
 package com.gaming.gamer;
 
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/members")
 public class memberscontrollers {
 
-    private static final Logger logger = LoggerFactory.getLogger(memberscontrollers.class);
+    @Autowired
+    private membersservice service;
 
-    private final membersservice service;
-
-    public memberscontrollers(membersservice service) {
-        this.service = service;
-    }
-
+    // CREATE
     @PostMapping
-    public MemberSearchResponseDTO create(@RequestBody MemberDTO memberDTO) {
-        logger.info("Controller: creating member {}", memberDTO.getName());
-        return service.create(memberDTO);
+    public ResponseEntity<MemberDTO> create(@RequestBody MemberDTO memberDTO) {
+        MemberDTO created = service.create(memberDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    // GET ALL
     @GetMapping
-    public List<MemberSearchResponseDTO> findAll() {
-        logger.info("Controller: fetching all members");
-        return service.findAll();
+    public ResponseEntity<List<MemberDTO>> findAll() {
+        List<MemberDTO> members = service.findAll();
+        return ResponseEntity.ok(members);
     }
 
+    // GET BY ID
     @GetMapping("/{id}")
-    public MemberSearchResponseDTO findById(@PathVariable String id) {
-        logger.info("Controller: fetching member by Id {}", id);
-        return service.findById(id);
+    public ResponseEntity<MemberDTO> findById(@PathVariable String id) {
+        MemberDTO member = service.findById(id);
+        return ResponseEntity.ok(member);
     }
 
+    // UPDATE
     @PutMapping("/{id}")
-    public MemberSearchResponseDTO update(@PathVariable String id, @RequestBody MemberDTO updatedDTO) {
-        logger.info("Controller: updating member Id {}", id);
-        return service.update(id, updatedDTO);
+    public ResponseEntity<MemberDTO> update(@PathVariable String id, @RequestBody MemberDTO memberDTO) {
+        MemberDTO updated = service.update(id, memberDTO);
+        return ResponseEntity.ok(updated);
     }
 
+    // DELETE
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
-        logger.info("Controller: deleting member Id {}", id);
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/search")
-    public MemberSearchResponseDTO searchByPhone(@RequestBody Map<String, String> payload) {
-        String phone = payload.get("phone");
-        logger.info("Controller: searching member by phone {}", phone);
-        return service.searchByPhone(phone);
+    // SEARCH BY PHONE
+    @GetMapping ("/search")
+    public ResponseEntity<MemberDTO> searchMemberByPhone(@RequestBody SearchRequestDTO searchRequest) {
+        System.out.println(" ******* inside search member");
+    	
+    	MemberDTO profile = service.searchByPhone(searchRequest.getPhone());
+        return ResponseEntity.ok(profile);
     }
 }
